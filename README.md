@@ -11,11 +11,11 @@ A Bun/Node-compatible TypeScript toolkit that exposes tmux pane context and logs
 1. Ensure the target tmux session is running.
 2. Launch the MCP server with:
    ```bash
-   bunx @yuki-yano/tmux-mcp
+   bunx @yuki-yano/tmux-mcp@latest
    ```
    or, if you prefer npm:
    ```bash
-   npx @yuki-yano/tmux-mcp
+   npx @yuki-yano/tmux-mcp@latest
    ```
 3. Keep the process running; it communicates with clients over STDIN/STDOUT.
 
@@ -28,7 +28,7 @@ A Bun/Node-compatible TypeScript toolkit that exposes tmux pane context and logs
 
 ### Codex CLI
 1. Ensure `@yuki-yano/tmux-mcp` is available (via `bunx`/`npx` or a local install).
-2. In the Codex CLI config, add an MCP command provider pointing to `bunx @yuki-yano/tmux-mcp`.
+2. In the Codex CLI config, add an MCP command provider pointing to `bunx @yuki-yano/tmux-mcp@latest`.
 3. Restart the CLI to register the tools.
 4. Use `/mcp call tmux.fetch-log {"mode":"capture","paneId":"%3","lines":200}` or similar commands.
 
