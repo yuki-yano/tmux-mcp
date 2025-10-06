@@ -37,8 +37,7 @@ describe("createMcpServer", () => {
 
   it("returns a successful describe-context response", async () => {
     const data = {
-      primaryPane: { id: "%1", title: "vim", session: "dev", window: "1" },
-      candidates: [],
+      sessionPanes: [{ id: "%1", title: "vim", session: "dev", window: "1" }],
     };
     mocks.contextResolver.describe.mockResolvedValue(data);
 

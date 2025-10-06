@@ -256,6 +256,7 @@ export const createMcpServer = (
     createContextResolver({
       tmux: {
         listPanes: tmuxFacade.listPanes,
+        getCurrentSession: tmuxFacade.getCurrentSession,
       },
     });
   const fileTail = createFileTail();

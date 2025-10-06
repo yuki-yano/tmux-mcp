@@ -87,8 +87,7 @@ describe("sdk-server", () => {
     domainDescribe.mockResolvedValue({
       success: true,
       data: {
-        primaryPane: { id: "%1", title: "vim", session: "dev", window: "1" },
-        candidates: [],
+        sessionPanes: [{ id: "%1", title: "vim", session: "dev", window: "1" }],
       },
     });
 
@@ -121,7 +120,7 @@ describe("sdk-server", () => {
     const result = await handler({ paneHint: "%1" });
     expect(domainDescribe).toHaveBeenCalledWith({ paneHint: "%1" });
     expect(result).toMatchObject({
-      structuredContent: { primaryPane: { id: "%1" } },
+      structuredContent: { sessionPanes: [{ id: "%1" }] },
     });
   });
 
@@ -147,8 +146,7 @@ describe("sdk-server", () => {
     domainDescribe.mockResolvedValue({
       success: true,
       data: {
-        primaryPane: { id: "%1", title: "vim", session: "dev", window: "1" },
-        candidates: [],
+        sessionPanes: [{ id: "%1", title: "vim", session: "dev", window: "1" }],
       },
     });
     domainFetch.mockResolvedValue({

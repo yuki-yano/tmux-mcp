@@ -20,6 +20,7 @@ export type TmuxFacade = {
   listPanes: () => Promise<TmuxPane[]>;
   capturePane: (options: CapturePaneOptions) => Promise<{ lines: string[] }>;
   pipePane: (options: PipePaneOptions) => Promise<PipeHandle>;
+  getCurrentSession: () => Promise<string | undefined>;
 };
 
 const LIST_PANES_FORMAT =
@@ -153,10 +154,17 @@ export const createTmuxFacade = (config: AppConfig): TmuxFacade => {
     }
   };
 
+  const getCurrentSession = async () => {
+    const { stdout } = await exec(["display-message", "-p", "#S"]);
+    const session = stdout.trim();
+    return session === "" ? undefined : session;
+  };
+
   return {
     listPanes,
     capturePane,
     pipePane,
+    getCurrentSession,
   };
 };
 

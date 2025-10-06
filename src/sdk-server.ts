@@ -180,10 +180,12 @@ const buildDescribeContextResult = (
   >,
 ) => {
   const structuredContent = {
-    primaryPane: data.primaryPane,
-    candidates: data.candidates,
+    sessionPanes: data.sessionPanes,
   };
-  const summary = `Primary pane: ${data.primaryPane.title} (${data.primaryPane.session}:${data.primaryPane.window})`;
+  const topPane = data.sessionPanes[0];
+  const summary = topPane
+    ? `Top pane: ${topPane.title} (${topPane.session}:${topPane.window})`
+    : "No panes detected.";
   return {
     structuredContent,
     content: [textBlock(summary)],
