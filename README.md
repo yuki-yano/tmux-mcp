@@ -1,4 +1,4 @@
-# tmux-mcp
+# Tmux MCP Server
 
 A Bun/Node-compatible TypeScript toolkit that exposes tmux pane context and logs through the Model Context Protocol (MCP). It lets MCP-compatible assistants inspect and troubleshoot your live tmux session.
 
@@ -7,30 +7,8 @@ A Bun/Node-compatible TypeScript toolkit that exposes tmux pane context and logs
 - Bun 1.2+
 - tmux installed on the host machine
 
-## Run the Server (recommended)
-1. Ensure the target tmux session is running.
-2. Launch the MCP server with:
-   ```bash
-   bunx @yuki-yano/tmux-mcp@latest
-   ```
-   or, if you prefer npm:
-   ```bash
-   npx @yuki-yano/tmux-mcp@latest
-   ```
-3. Keep the process running; it communicates with clients over STDIN/STDOUT.
-
-## Connecting MCP Clients
-### Claude Code (Desktop)
-1. Open Claude Code settings → **Model Context Protocol** → **Add Provider**.
-2. Choose **Command**, set executable to `bunx`, and arguments to `@yuki-yano/tmux-mcp`.
-3. Reload Claude Code. The `tmux` tools become available in the command palette and chat.
-4. Ask Claude to call tools such as `tmux.describe-context` or `tmux.fetch-log`.
-
-### Codex CLI
-1. Ensure `@yuki-yano/tmux-mcp` is available (via `bunx`/`npx` or a local install).
-2. In the Codex CLI config, add an MCP command provider pointing to `bunx @yuki-yano/tmux-mcp@latest`.
-3. Restart the CLI to register the tools.
-4. Use `/mcp call tmux.fetch-log {"mode":"capture","paneId":"%3","lines":200}` or similar commands.
+## Configure MCP Agents
+MCP-capable tools should launch the server themselves. Configure each agent to run `bunx @yuki-yano/tmux-mcp@latest` (or `npx @yuki-yano/tmux-mcp@latest`) as a command provider; there is no need to start the server manually.
 
 ## MCP Tool Reference
 All tools live under the `tmux` namespace. Validation is handled with Zod; requests outside these shapes are rejected and surface as `tool call failed` errors.
@@ -69,11 +47,7 @@ All tools live under the `tmux` namespace. Validation is handled with Zod; reque
 
 ## Example Calls
 ```jsonc
-// Claude Code prompt
 tmux.describe-context { "paneHint": "%3" }
-
-// Codex CLI command
-/mcp call tmux.fetch-log {"mode":"capture","paneId":"%305","lines":400}
 
 // Start then stop a live stream (generic MCP JSON-RPC)
 {
