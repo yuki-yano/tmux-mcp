@@ -11,15 +11,29 @@ A Bun/Node-compatible TypeScript toolkit that exposes tmux pane context and logs
 1. Ensure the target tmux session is running.
 2. Launch the MCP server with:
    ```bash
-   bunx tmux-mcp
+   bunx @yuki-yano/tmux-mcp
    ```
    or, if you prefer npm:
    ```bash
-   npx tmux-mcp
+   npx @yuki-yano/tmux-mcp
    ```
 3. Keep the process running; it communicates with clients over STDIN/STDOUT.
 
+## Connecting MCP Clients
+### Claude Code (Desktop)
+1. Open Claude Code settings → **Model Context Protocol** → **Add Provider**.
+2. Choose **Command**, set executable to `bunx`, and arguments to `@yuki-yano/tmux-mcp`.
+3. Reload Claude Code. The `tmux` tools become available in the command palette and chat.
+4. Ask Claude to call tools such as `tmux.describe-context` or `tmux.fetch-log`.
+
+### Codex CLI
+1. Ensure `@yuki-yano/tmux-mcp` is available (via `bunx`/`npx` or a local install).
+2. In the Codex CLI config, add an MCP command provider pointing to `bunx @yuki-yano/tmux-mcp`.
+3. Restart the CLI to register the tools.
+4. Use `/mcp call tmux.fetch-log {"mode":"capture","paneId":"%3","lines":200}` or similar commands.
+
 ## MCP Tool Reference
+All tools live under the `tmux` namespace. Validation is handled with Zod; requests outside these shapes are rejected and surface as `tool call failed` errors.
 
 ### `tmux.describe-context`
 - **Purpose**: identify the most relevant tmux pane and provide ranked alternatives.
@@ -55,10 +69,10 @@ A Bun/Node-compatible TypeScript toolkit that exposes tmux pane context and logs
 
 ## Example Calls
 ```jsonc
-// Claude Code prompt example
+// Claude Code prompt
 tmux.describe-context { "paneHint": "%3" }
 
-// Codex CLI `/mcp` command
+// Codex CLI command
 /mcp call tmux.fetch-log {"mode":"capture","paneId":"%305","lines":400}
 
 // Start then stop a live stream (generic MCP JSON-RPC)
@@ -75,11 +89,11 @@ tmux.describe-context { "paneHint": "%3" }
 ## Optional Local Installation
 If you need to bundle the server with other tooling:
 ```bash
-npm install tmux-mcp
+npm install @yuki-yano/tmux-mcp
 # or
-bun add tmux-mcp
+bun add @yuki-yano/tmux-mcp
 ```
-Then invoke `npx tmux-mcp`, `bunx tmux-mcp`, or add `"tmux-mcp"` to your MCP client config.
+Once installed locally, the executable name is `tmux-mcp`, so `npx tmux-mcp` or `bunx tmux-mcp` will resolve to the same CLI.
 
 ## Configuration
 Environment variables tweak runtime behaviour:

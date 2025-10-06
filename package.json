@@ -1,5 +1,5 @@
 {
-  "name": "tmux-mcp",
+  "name": "@yuki-yano/tmux-mcp",
   "version": "0.0.1",
   "description": "Development environment for the tmux MCP server",
   "type": "module",
