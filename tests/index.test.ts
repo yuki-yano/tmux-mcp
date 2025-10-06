@@ -120,6 +120,26 @@ describe("createMcpServer", () => {
     });
   });
 
+  it("guides clients when fetch-log mode is invalid", async () => {
+    const server = createMcpServer({
+      logger: mocks.logger,
+      contextResolver: mocks.contextResolver,
+      logFetcher: mocks.logFetcher,
+    });
+    const response = await server.commands.fetchLog({
+      mode: "tail",
+    } as unknown as never);
+
+    expect(response).toEqual({
+      success: false,
+      error: {
+        code: "INVALID_ARGUMENT",
+        message:
+          'mode: Invalid mode. Use one of "capture", "file", "stream". For tmux pane snapshots call {"mode":"capture","paneId":"%123"}. For live streaming call tmux.stream-log.',
+      },
+    });
+  });
+
   it("handles stream-log start and stop", async () => {
     mocks.logFetcher.openStream.mockResolvedValue({
       id: "stream",

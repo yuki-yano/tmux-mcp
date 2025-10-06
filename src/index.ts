@@ -134,14 +134,29 @@ const getErrorMessage = (error: unknown) => {
   return "Unknown error";
 };
 
+const formatZodIssue = (issue: z.ZodIssue) => {
+  const scope = issue.path.length > 0 ? issue.path.join(".") : "input";
+  const field =
+    issue.path.length > 0 ? issue.path[issue.path.length - 1] : undefined;
+
+  if (
+    issue.code === z.ZodIssueCode.invalid_value &&
+    field === "mode" &&
+    "values" in issue &&
+    Array.isArray(issue.values)
+  ) {
+    const options = issue.values
+      .map((value) => `"${String(value)}"`)
+      .join(", ");
+    return `${scope}: Invalid mode. Use one of ${options}. For tmux pane snapshots call {"mode":"capture","paneId":"%123"}. For live streaming call tmux.stream-log.`;
+  }
+
+  return `${scope}: ${issue.message}`;
+};
+
 const formatZodError = (issues: z.ZodIssue[]) => {
   if (issues.length === 0) return "Invalid input";
-  return issues
-    .map(
-      (issue) =>
-        `${issue.path.length > 0 ? issue.path.join(".") : "input"}: ${issue.message}`,
-    )
-    .join("; ");
+  return issues.map(formatZodIssue).join("; ");
 };
 
 type WithoutMeta<T extends { _meta?: unknown }> = Omit<T, "_meta">;

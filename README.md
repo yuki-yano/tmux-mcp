@@ -23,26 +23,38 @@ All tools live under the `tmux` namespace. Validation is handled with Zod; reque
 ### `tmux.fetch-log`
 - **Purpose**: take a one-off log snapshot from a tmux pane or file.
 - **Required field**: `mode` must be `"capture"` or `"file"`.
-- **Capture mode** (`mode: "capture"`):
-  - `paneId` (required) — tmux pane id (for example `"%305"`).
-  - `lines` — positive integer ≤ 10_000; defaults to `TMUX_CONTEXT_CAPTURE_LINES` (2000 if unset).
-  - `filters` — optional `timeRange`, `keywords`, `levels` filters.
-  - `maskPatterns` — strings or regex fragments replaced with `***`.
-  - `summary` — include `{ totalLines, errorCount, firstErrorLine? }`.
-- **File mode** (`mode: "file"`):
-  - `filePath` (required) — absolute path to the log file; response exposes a readable stream.
-- **Invalid modes**: values such as `"tail"`, `"full"`, or `"stream"` cause validation failure. Use `tmux.stream-log` for ongoing streaming.
+- **When to use**: choose `mode: "capture"` for panes, `mode: "file"` for local log files. Use `tmux.stream-log` for anything that needs to keep streaming.
+
+#### Capture mode (pane snapshot)
+- `paneId` — tmux pane id (for example `"%305"`).
+- `lines` — positive integer ≤ 10_000; defaults to `TMUX_CONTEXT_CAPTURE_LINES` (2000 if unset).
+- `filters` — optional `timeRange`, `keywords`, `levels` filters.
+- `maskPatterns` — strings or regex fragments replaced with `***`.
+- `summary` — include `{ totalLines, errorCount, firstErrorLine? }`.
+
+```json
+{ "mode": "capture", "paneId": "%305", "lines": 400 }
+```
+
+#### File mode (log tail)
+- `filePath` — absolute path to the log file; response exposes a readable stream.
+
+```json
+{ "mode": "file", "filePath": "/var/log/app.log" }
+```
+
+> Info: Passing `mode: "tail"` or `mode: "stream"` triggers a validation error. For live streaming call `tmux.stream-log`.
 
 ### `tmux.stream-log`
 - **Purpose**: manage a live `pipe-pane` stream.
-- **Start**: `{ mode: "stream", paneId: "..." }` (optional `action: "start"` ignored).
-- **Stop**: `{ mode: "stream", action: "stop", streamId, stopToken }` using the token returned on start.
-- **Responses**: `{ id, stopToken }` on start and stop.
+- **Start**: `{ "mode": "stream", "paneId": "%1" }` (the optional `action: "start"` is ignored).
+- **Stop**: `{ "mode": "stream", "action": "stop", "streamId": "...", "stopToken": "..." }` using the `id` and `stopToken` returned when you started the stream.
+- **Responses**: `{ id, stopToken }` for both start and stop.
 - **Errors**: `paneId is required`, `Stream not found: ...`, `Invalid stop token`.
 
 ### Typical Failure Scenarios
 - Missing required fields (`paneId is required`, `filePath is required`).
-- Unsupported `mode` strings supplied to `fetch-log`.
+- Unsupported `mode` strings supplied to `fetch-log` (the error message includes the valid options).
 - Using a stale or incorrect `stopToken` when stopping a stream.
 
 ## Example Calls

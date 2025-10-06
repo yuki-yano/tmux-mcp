@@ -8,7 +8,7 @@ import {
   ListToolsRequestSchema,
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
-import type { ZodIssue } from "zod";
+import { type ZodIssue, ZodIssueCode } from "zod";
 import type { CommandResponse } from "@/index";
 import {
   type CreateMcpServerOptions,
@@ -251,28 +251,47 @@ const registerTools = (
   const tools = [
     {
       name: "describe-context",
-      description: "Return information about active tmux panes",
+      description:
+        "Return information about active tmux panes. Pass `paneHint` to target a specific id, session, window, or title.",
       inputSchema: describeContextJsonSchema,
     },
     {
       name: "fetch-log",
-      description: "Fetch logs from a tmux pane or file",
+      description:
+        'Fetch logs once from a tmux pane or log file. Set `mode: "capture"` with `paneId` for pane output, `mode: "file"` with `filePath` for files. Use `tmux.stream-log` when you need a live stream.',
       inputSchema: fetchLogJsonSchema,
     },
     {
       name: "stream-log",
-      description: "Start or stop a tmux pane log stream",
+      description:
+        'Start or stop a live tmux pane stream. Start with {"mode":"stream","paneId":"%1"} and stop with the returned id/stopToken.',
       inputSchema: streamLogJsonSchema,
     },
   ];
 
-  const formatIssues = (issues: ZodIssue[]) =>
-    issues
-      .map(
-        (issue) =>
-          `${issue.path.length > 0 ? issue.path.join(".") : "input"}: ${issue.message}`,
-      )
-      .join("; ");
+  const formatZodIssue = (issue: ZodIssue) => {
+    const scope = issue.path.length > 0 ? issue.path.join(".") : "input";
+    const field =
+      issue.path.length > 0 ? issue.path[issue.path.length - 1] : undefined;
+
+    if (
+      issue.code === ZodIssueCode.invalid_value &&
+      field === "mode" &&
+      "values" in issue &&
+      Array.isArray((issue as { values?: unknown }).values)
+    ) {
+      const values = (issue as { values: unknown[] }).values;
+      const options = values.map((value) => `"${String(value)}"`).join(", ");
+      return `${scope}: Invalid mode. Use one of ${options}. For tmux pane snapshots call {"mode":"capture","paneId":"%123"}. For live streaming call tmux.stream-log.`;
+    }
+
+    return `${scope}: ${issue.message}`;
+  };
+
+  const formatIssues = (issues: ZodIssue[]) => {
+    if (issues.length === 0) return "Invalid input";
+    return issues.map(formatZodIssue).join("; ");
+  };
 
   const handlers: Record<string, (args: unknown) => Promise<CallToolResult>> = {
     "describe-context": async (args) => {
