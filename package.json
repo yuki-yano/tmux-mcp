@@ -1,6 +1,6 @@
 {
   "name": "@yuki-yano/tmux-mcp",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Development environment for the tmux MCP server",
   "type": "module",
   "main": "dist/index.js",

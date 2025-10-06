@@ -66,34 +66,43 @@ const paneMatchesHint = (pane: TmuxPane, hint: string) => {
   return false;
 };
 
-const createPriority = (pane: TmuxPane, hint?: string) => {
+const createPriority = (
+  pane: TmuxPane,
+  hint: string | undefined,
+  activeSessions: Set<string>,
+) => {
+  const recencyScore = pane.lastUsed ?? FALLBACK_RECENCY;
   if (hint && paneMatchesHint(pane, hint)) {
     return {
       score: HINT_PRIORITY,
-      recencyScore: pane.lastUsed ?? FALLBACK_RECENCY,
+      recencyScore,
     };
   }
-  if (pane.isActive) {
+
+  const isInActiveSession =
+    activeSessions.size === 0 || activeSessions.has(pane.session);
+
+  if (pane.isActive && isInActiveSession) {
     return {
       score: ACTIVE_PRIORITY,
-      recencyScore: pane.lastUsed ?? FALLBACK_RECENCY,
+      recencyScore,
     };
   }
   if (pane.isActiveWindow) {
     return {
       score: ACTIVE_WINDOW_PRIORITY,
-      recencyScore: pane.lastUsed ?? FALLBACK_RECENCY,
+      recencyScore,
     };
   }
   if (pane.isActiveSession) {
     return {
       score: ACTIVE_SESSION_PRIORITY,
-      recencyScore: pane.lastUsed ?? FALLBACK_RECENCY,
+      recencyScore,
     };
   }
   return {
     score: DEFAULT_PRIORITY,
-    recencyScore: pane.lastUsed ?? FALLBACK_RECENCY,
+    recencyScore,
   };
 };
 
@@ -122,10 +131,14 @@ export const createContextResolver = (
     const panes = await options.tmux.listPanes();
     if (panes.length === 0) throw createNoPaneError();
 
+    const activeSessions = new Set(
+      panes.filter((pane) => pane.isActiveSession).map((pane) => pane.session),
+    );
+
     const sorted = panes
       .map((pane) => ({
         pane,
-        priority: createPriority(pane, request.paneHint),
+        priority: createPriority(pane, request.paneHint, activeSessions),
       }))
       .sort(comparePriority)
       .map((entry) => normalizePane(entry.pane));

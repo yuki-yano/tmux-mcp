@@ -61,6 +61,35 @@ describe("createContextResolver", () => {
     ]);
   });
 
+  it("ignores active panes from other sessions", async () => {
+    const panes: TmuxPane[] = [
+      {
+        id: "%1",
+        title: "vim",
+        session: "dev",
+        window: "1",
+        isActiveWindow: true,
+        isActiveSession: true,
+        lastUsed: 100,
+      },
+      {
+        id: "%2",
+        title: "ops-shell",
+        session: "ops",
+        window: "1",
+        isActive: true,
+        isActiveSession: false,
+        lastUsed: 200,
+      },
+    ];
+    const resolver = createResolver(panes);
+
+    const result = await resolver.describe({});
+
+    expect(result.primaryPane.id).toBe("%1");
+    expect(result.candidates.map((pane) => pane.id)).toEqual(["%1", "%2"]);
+  });
+
   it("sorts by lastUsed descending when priority ties", async () => {
     const panes: TmuxPane[] = [
       {
