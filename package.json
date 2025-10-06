@@ -1,0 +1,52 @@
+{
+  "name": "tmux-mcp",
+  "version": "0.0.1",
+  "description": "Development environment for the tmux MCP server",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "tmux-contextual-log-mcp": "dist/cli.js",
+    "tmux-mcp": "dist/cli.js"
+  },
+  "scripts": {
+    "format": "biome format --write .",
+    "format:check": "biome check .",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "typecheck": "tsc --noEmit",
+    "build": "tsdown --config tsdown.config.ts",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "start": "node dist/index.js",
+    "ci": "bun run format:check && bun run typecheck && bun run lint && bun run test"
+  },
+  "engines": {
+    "node": ">=20",
+    "bun": ">=1.2"
+  },
+  "packageManager": "bun@1.2.23",
+  "keywords": [
+    "tmux",
+    "claude",
+    "mcp"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.5",
+    "@types/node": "^24.6.2",
+    "cross-env": "^10.1.0",
+    "tsdown": "^0.15.6",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.19.1",
+    "strip-ansi": "^7.1.2",
+    "zod": "^4.1.11"
+  }
+}
