@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { startSdkServer } from "@/sdk-server";
 
 export const startCli = async () => {
@@ -8,13 +12,12 @@ export const startCli = async () => {
 };
 
 const isMainEntry = () => {
-  if (typeof process.argv[1] !== "string") return false;
-  const scriptPath = process.argv[1];
+  const scriptArg = process.argv[1];
+  if (typeof scriptArg !== "string") return false;
   try {
-    return (
-      new URL(import.meta.url).pathname ===
-      new URL(`file://${scriptPath}`).pathname
-    );
+    const entryPath = realpathSync(scriptArg);
+    const modulePath = realpathSync(fileURLToPath(import.meta.url));
+    return entryPath === modulePath;
   } catch {
     return false;
   }
