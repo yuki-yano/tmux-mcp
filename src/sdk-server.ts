@@ -108,29 +108,29 @@ const fetchLogJsonSchema = {
 
 const streamLogJsonSchema = {
   type: "object",
-  oneOf: [
-    {
-      type: "object",
-      properties: {
-        mode: { const: "stream" },
-        action: { const: "stop" },
-        streamId: { type: "string" },
-        stopToken: { type: "string" },
-      },
-      required: ["mode", "action", "streamId", "stopToken"],
-      additionalProperties: false,
+  properties: {
+    mode: { const: "stream" },
+    action: {
+      type: "string",
+      enum: ["start", "stop"],
+      description:
+        'Use "start" (default) to open a new stream or "stop" to close an existing stream.',
     },
-    {
-      type: "object",
-      properties: {
-        mode: { const: "stream" },
-        action: { const: "start" },
-        paneId: { type: "string" },
-      },
-      required: ["mode", "paneId"],
-      additionalProperties: false,
+    paneId: {
+      type: "string",
+      description: "Required when starting a new stream.",
     },
-  ],
+    streamId: {
+      type: "string",
+      description: "Required when stopping an existing stream.",
+    },
+    stopToken: {
+      type: "string",
+      description: "Required when stopping an existing stream.",
+    },
+  },
+  required: ["mode"],
+  additionalProperties: false,
 } as const;
 
 const ensureContent = (blocks?: Array<{ type: "text"; text: string }>) => {
