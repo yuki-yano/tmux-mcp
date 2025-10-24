@@ -1,6 +1,6 @@
 {
   "name": "@yuki-yano/tmux-mcp",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Development environment for the tmux MCP server",
   "type": "module",
   "main": "dist/index.js",
@@ -19,6 +19,7 @@
     "lint:fix": "biome lint --write .",
     "typecheck": "tsc --noEmit",
     "build": "tsdown",
+    "dev": "tsdown --watch",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "start": "node dist/index.js",
