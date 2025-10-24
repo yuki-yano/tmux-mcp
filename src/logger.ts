@@ -19,8 +19,8 @@ export const createLogger = (): Logger => {
     const formatted = formatConsoleMessage(message);
     if (formatted === "") return;
 
-    if (level === "info") console.info(formatted);
-    else console.error(formatted);
+    // STDERR を使って MCP の stdout チャネルを汚染しない
+    process.stderr.write(`${formatted}\n`);
   };
 
   return {
